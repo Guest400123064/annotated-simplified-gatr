@@ -14,7 +14,7 @@ def generate_random_data(config: BasicConfig) -> torch.Tensor:
     torch.Tensor
         Generated random data of shape (batch_size, num_points, input_channels, 16).
     """
-    batch_size = torch.randint(1, config.max_batch_size + 1, (1,)).item()
-    num_points = torch.randint(1, config.max_context_size + 1, (1,)).item()
-    input_channels = torch.randint(1, config.max_channel_size + 1, (1,)).item()
+    batch_size = int(torch.randint(1, config.max_batch_size + 1, (1,)).item())
+    num_points = int(torch.randint(1, config.max_context_size + 1, (1,)).item())
+    input_channels = int(torch.randint(1, config.max_channel_size + 1, (1,)).item())
     return torch.randn(batch_size, num_points, input_channels, 16)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 import torch
 import torch.nn.functional as F
@@ -9,7 +9,7 @@ from einops import rearrange
 
 from ezgatr.nn.functional.linear import _compute_inner_product_selector
 
-GeometricQKVType = Union[torch.Tensor, tuple[torch.Tensor, torch.Tensor]]
+GeometricQKVType = torch.Tensor | tuple[torch.Tensor, torch.Tensor]
 GeometricAttnKindType = Literal["ipa", "daa"]
 
 
@@ -172,7 +172,7 @@ def equi_geometric_attention(
     dropout_p: float = 0.0,
     is_causal: bool = False,
     scale: float | None = None,
-) -> GeometricQKVType:
+) -> tuple[torch.Tensor, torch.Tensor | None]:
     r"""Equivariant geometric attention.
 
     Parameters
@@ -246,11 +246,16 @@ def equi_geometric_attention(
 
         # Save the index for the scalar channel tensors to separate them from the multi-vector
         # channel tensors after the attention calculation.
-        value = torch.cat([_flatten_ck(value), value_scl], dim=-1)  # type: ignore[arg-type]
+        value = torch.cat([_flatten_ck(value), value_scl], dim=-1)
         index_scl = -value_scl.shape[-1]
     else:
-        value = _flatten_ck(value)  # type: ignore[arg-type]
+        assert not isinstance(value, tuple)
+        value = _flatten_ck(value)
         index_scl = None
+
+    # After the branches above, query, key, and value are all plain multi-vector
+    # tensors: either unpacked from the tuples or passed in directly.
+    assert isinstance(query, torch.Tensor) and isinstance(key, torch.Tensor)
 
     # Weights are only applied to the multi-vector channel tensors even if
     # scalar channel tensors are supplied. The scalar channel weights would
@@ -262,7 +267,7 @@ def equi_geometric_attention(
             f"kinds and {len(weight)} weights."
         )
     for (kind, kwargs), w in zip(kinds.items(), weight):
-        q, k = _ATTENTION_KIND_DISPATCH[kind](query, key, **(kwargs or {}))  # type: ignore[operator]
+        q, k = _ATTENTION_KIND_DISPATCH[kind](query, key, **(kwargs or {}))
         qs.append(_flatten_ck(q * w))
         ks.append(_flatten_ck(k))
 

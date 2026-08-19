@@ -22,38 +22,39 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      run: |
-        python -m pip install -U pip
-        pip install --upgrade poetry
-
-    - name: Separate installation of llvmlite
-      run: pip install "llvmlite==0.41.1"
-
     - name: Install dependencies
-      run: poetry install --with dev
+      run: uv sync --group dev
 
-    - name: Run tests
-      run: poetry run coverage run -m pytest tests
+    - name: Lint and format check
+      run: uv run ruff check src/ && uv run ruff format --check src/
+
+    - name: Type check
+      run: uv run ty check src/
 
     - name: Generate coverage report
-      run: |
-        poetry run coverage combine || true
-        poetry run coverage xml
-        poetry run coverage report
+      run: uv run pytest --cov=ezgatr --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
 
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
+    - name: Upload coverage to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        slug: Guest400123064/ezgatr
+        files: ./coverage.xml
+        fail_ci_if_error: false
+        verbose: true
+
+    - name: Upload test results to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,1 +1,3 @@
-from ezgatr.nn.modules import *  # noqa: F403
+from ezgatr.nn.modules import EquiLinear, EquiRMSNorm
+
+__all__ = ["EquiLinear", "EquiRMSNorm"]

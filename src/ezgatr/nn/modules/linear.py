@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import math
+from typing import ClassVar
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 from ezgatr.nn.functional.linear import equi_linear
 
@@ -22,7 +23,11 @@ class EquiLinear(nn.Module):
         "inflow paths" for each blade.
     """
 
-    __constants__ = ["in_channels", "out_channels", "normalize_basis"]
+    __constants__: ClassVar[list[str]] = [
+        "in_channels",
+        "out_channels",
+        "normalize_basis",
+    ]
 
     in_channels: int
     out_channels: int
@@ -39,17 +44,18 @@ class EquiLinear(nn.Module):
         device: torch.device | None = None,
         dtype: torch.dtype | None = None,
     ) -> None:
-        factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.normalize_basis = normalize_basis
         self.weight = nn.Parameter(
-            torch.empty((out_channels, in_channels, 9), **factory_kwargs)
+            torch.empty((out_channels, in_channels, 9), device=device, dtype=dtype)
         )
         if bias:
-            self.bias = nn.Parameter(torch.empty(out_channels, **factory_kwargs))
+            self.bias = nn.Parameter(
+                torch.empty(out_channels, device=device, dtype=dtype)
+            )
         else:
             self.register_parameter("bias", None)
         self.reset_parameters()

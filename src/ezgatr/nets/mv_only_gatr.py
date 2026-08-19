@@ -6,8 +6,8 @@ from functools import reduce
 from typing import Any, Literal
 
 import torch
-import torch.nn as nn
 from einops import rearrange
+from torch import nn
 
 from ezgatr.nn import EquiLinear, EquiRMSNorm
 from ezgatr.nn.functional import (
@@ -268,7 +268,7 @@ class MVOnlyGATrAttention(nn.Module):
         # and blade dimension, respectively.
         attn_mix_shape = (config.attn_num_heads, 1, config.size_channels_hidden, 1)
         self.attn_mix = {}
-        for kind in config.attn_kinds.keys():
+        for kind in config.attn_kinds:
             param = nn.Parameter(torch.zeros(attn_mix_shape, dtype=torch.float32))
             self.attn_mix[kind] = param
             self.register_parameter(f"attn_mix_{kind}", param)

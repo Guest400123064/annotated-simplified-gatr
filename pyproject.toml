@@ -1,41 +1,36 @@
 [project]
 name = "ezgatr"
-version = "0.1.0-alpha"
-description = ""
+version = "0.1.0b1"
+description = "Easy-to-use geometric algebra transformer library built on PyTorch."
+readme = "README.md"
+requires-python = ">=3.10"
 authors = [
     {name = "guest400123064", email = "wangy49@seas.upenn.edu"},
     {name = "M4D-SC1ENTIST", email = "xiatao.sun@yale.edu"}
 ]
-readme = "README.md"
-packages = [
-    { include = "ezgatr", from = "src" }
-]
-requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
-    "torch (>=2.1.0,<2.4.1)",
-    "einops (>=0.8.1,<0.9.0)",
+    "einops>=0.8.1",
+    "torch>2.4.0",
 ]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-hypothesis = "^6.112.2"
-pre-commit = "^3.8.0"
-ruff = "^0.6.8"
-ipykernel = "^6.29.5"
-ipywidgets = "^8.1.5"
-bpython = "^0.24"
-pytest-cov = "^5.0.0"
-coverage = {extras = ["toml"], version = "^7.6.1"}
-mypy = "^1.11.2"
-numba = "<0.59.0"
-clifford = "^1.4.0"
-toml = "^0.10.2"
-
-
-[tool.poetry.group.docs.dependencies]
-pdoc = "^14.7.0"
-
+[dependency-groups]
+dev = [
+    "bpython>=0.26",
+    "clifford>=1.4.0",
+    "hypothesis>=6.112.2",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.5",
+    "pdoc>=16.0.0",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.3",
+    "toml>=0.10.2",
+    "ty>=0.0.73",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"

@@ -4,9 +4,10 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        args: ["--maxkb=1024"]
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-symlinks
@@ -14,11 +15,10 @@ repos:
       - id: debug-statements
       - id: end-of-file-fixer
       - id: mixed-line-ending
-      - id: requirements-txt-fixer
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.14.3
     hooks:
       - id: ruff
         files: "^src/"
@@ -29,13 +29,19 @@ repos:
         files: "^src/"
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.31.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
-        args: [--py37-plus]
+        args: [--py310-plus]
+
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.73
+    hooks:
+      - id: ty
+        files: "^src/"
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
